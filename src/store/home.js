@@ -8,6 +8,8 @@ export const useHomeStore = defineStore("home", {
     articles : [],
     article  : {},
     categories : [],
+    currentPage : 1,
+    totalPage  : 0
   }),
   actions: {
     async getArticles(paging = 9) {
@@ -15,6 +17,8 @@ export const useHomeStore = defineStore("home", {
         this.loading = true
         const response = await useFetchApi().get(`/home/get-articles?paging=${paging}`)
         this.articles = response.data.data
+        // console.log(response.data.last_page);
+        this.totalPage = response.data.last_page
         this.loading = false
       } catch (error) {
       }
@@ -33,6 +37,17 @@ export const useHomeStore = defineStore("home", {
         this.loading = true
         const response = await useFetchApi().get(`/home/get-category`)
         this.categories = response.data
+        this.loading = false
+      } catch (error) {
+      }
+    },
+    async loadMoreArticles(paging){
+      try {
+        this.loading = true
+        this.currentPage++
+        const  response = await useFetchApi().get(`/home/get-articles?page=${this.currentPage}&paging=${paging}`)
+        this.articles = [...this.articles, ...response.data.data]
+        // console.log(response.data);
         this.loading = false
       } catch (error) {
       }

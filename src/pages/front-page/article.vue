@@ -7,13 +7,19 @@
   const homeStore = useHomeStore();
   const articles = computed(() => homeStore.articles);
   const laoding   = computed(() => homeStore.loading);
+  const currentPage = computed(() => homeStore.currentPage);
+  const totalPage = computed(() => homeStore.totalPage);
 
   const categories = computed(() => homeStore.categories);
 
   onMounted(() => {
-    homeStore.getArticles(10);
+    homeStore.getArticles(4);
     homeStore.getCategories();
   });
+
+  async function handleLoadMore () {
+    await homeStore.loadMoreArticles(4);
+  };
 
 </script>
 
@@ -31,8 +37,8 @@
         <div class="grid md:grid-cols-2 gap-6 mb-16">
           <CardItem v-for="item in articles" :key="item.id" :item="item"/>
         </div>
-        <div class="text-center">
-          <button class="text-sm text-white bg-slate-900 px-6 py-3 rounded-lg hover:bg-slate-600 transition-all duration-200">load more</button>
+        <div class="text-center" v-if="currentPage < totalPage">
+          <button @click="handleLoadMore()" class="text-sm text-white bg-slate-900 px-6 py-3 rounded-lg hover:bg-slate-600 transition-all duration-200">load more</button>
         </div>
       </div>
       <div class="min-w-[300px] relative">

@@ -34,7 +34,7 @@
 
   </section>
 
-  <section class="pb-8 pt-16 bg-gray-100">
+  <section class="pb-8 pt-16 bg-gray-100 px-4">
     <div class="text-center mb-4">
       <p class="text-lg font-semibold text-slate-700">Silahkan Pilih Roadmap Kamu</p>
       <p class="text-sm font-medium text-slate-500">menjadi expret yang handal dengan belajar yan terstruktur dan sistematis</p>
@@ -50,7 +50,7 @@
     <div class="container relative">
       <div class="bg-white border-b-2 mb-4 p-4 flex justify-between align-middle rounded-lg sticky top-20">
         <h1 class="text-lg font-medium text-slate-700">Artikel Terbaru</h1>
-        <router-link to="/" class="text-sm font-medium text-white bg-slate-900 rounded-full px-2 py-1">
+        <router-link to="/article" class="text-sm font-medium text-white bg-slate-900 rounded-full px-2 py-1">
           lihat semua
         </router-link>
       </div>

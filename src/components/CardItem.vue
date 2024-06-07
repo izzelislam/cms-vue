@@ -13,7 +13,7 @@ const proops = defineProps({
   <div class="shadow-lg rounded-lg bg-white">
     <router-link :to="`/article/${item.id}`">
       <div>
-        <img class="rounded-lg" :src="item.image_url" :alt="item_slug">
+        <img class="rounded-lg" :src="item.image_url" :alt="item.slug">
       </div>
 
       <div class="p-4">
