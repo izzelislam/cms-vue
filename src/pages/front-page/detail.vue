@@ -43,7 +43,7 @@ import 'md-editor-v3/lib/preview.css';
     <div class="container grid grid-cols-1 lg:grid-cols-12 ">
       <div class="pb-16 md:col-span-9">
         <div>
-          <div class=" bg-white p-8 rounded-lg mb-16">
+          <div class=" bg-white p-4 rounded-lg mb-16">
 
             <h1 class="text-3xl text-slate-900 mb-6">{{ article.title }}</h1>
             <div>
@@ -66,9 +66,7 @@ import 'md-editor-v3/lib/preview.css';
                 </div>
             </div>
   
-            <div class="text-slate-600 text-justify leading-7">
-              <MdPreview :editorId="id" :modelValue="article.content" />
-            </div>
+            <MdPreview :editorId="id" :modelValue="article.content" />
           </div>
 
           <div class="bg-white p-8 rounded-lg">
