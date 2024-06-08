@@ -3,43 +3,47 @@
   <div class="w-full p-5 bg-white rounded-2xl">
     <div class="mb-6 flex justify-between">
       <h1>Buat Artikel</h1>
-      <router-link to="/admin/article" class="text-white bg-teal-500 px-8 py-2 rounded-lg flex items-center mr-6"> <vue-feather type="arrow-left"></vue-feather> kembali</router-link>
+      <router-link to="/admin/article" :class="defaulButtonStyle"> <vue-feather type="arrow-left"></vue-feather> kembali</router-link>
     </div>
     <div>
 
       <div class="mb-6">
-        <label for="" class="text-gray-500">Category</label>
-        <div class="mt-3">
-          <select name="category_id" id="" class="w-full border-2 border-gray-300 rounded-lg p-2" v-model="categoryId">
+        <label for="" class="text-gray-500 text-sm">Category</label>
+        <div class="mt-1">
+          <select :class="{ 'border-red-300': errors?.category_id }" name="category_id" id="" class="w-full border-2 border-gray-300 rounded-lg p-2 bg-white" v-model="data.category_id">
             <option v-for="(item, index) in categories" :key="index" class="text-gray-500" :value="item.id">{{ item.name }}</option>
           </select>
+          <div v-if="errors?.category_id">
+            <span class="text-red-500 text-sm mt-1">{{ errors?.category_id[0] }}</span>
+          </div>
         </div>
       </div>
 
-      <div class="mb-6">
-        <label for="" class="text-gray-500">Judul</label>
-        <div class="mt-3">
-          <input v-model="title" type="text" class="w-full border-2 border-gray-300 rounded-lg p-2">
-        </div>
-      </div>
+      <Input v-model="data.title" :error="errors?.title" title="Judul" />
 
       <div class="mb-6">
-        <label for="" class="text-gray-500">Gambar</label>
+        <label for="" class="text-gray-500 text-sm">Gambar</label>
         <img class="w-36" :src=" image ?? ''" alt="">
-        <div class="mt-3">
-          <input type="file" @change="handleImage($event)" class="w-full border-2 border-gray-300 rounded-lg p-2">
+        <div class="mt-1">
+          <input :class="{ 'border-red-300': errors?.image_cover }" type="file" @change="handleImage($event)" class="w-full border-2 border-gray-300 rounded-lg p-2">
+        </div>
+        <div v-if="errors?.image_cover">
+          <span class="text-red-500 text-sm mt-1">{{ errors?.image_cover[0] }}</span>
         </div>
       </div>
       <div class="mb-12">
         <label for="" class="text-gray-500">Gambar</label>
-        <div class="mt-3">
-          <MdEditor language="en-US" v-model="content" />
+        <div :class="{ 'border-red-300 border-2 rounded-lg': errors?.content }" class="mt-3">
+          <MdEditor language="en-US" v-model="data.content" />
           <!-- <QuillEditor v-model:content="content" content-type="html" theme="snow" class="w-full h-60 border-1 border-gray-500"/> -->
+        </div>
+        <div v-if="errors?.content">
+          <span class="text-red-500 text-sm mt-3">{{ errors?.content[0] }}</span>
         </div>
       </div>
 
       <div>
-        <button @click="handleSubmit" class="text-white bg-teal-500 px-8 py-2 rounded-lg">Simpan</button>
+        <button @click="handleSubmit" class="btn-primary">Simpan</button>
       </div>
 
     </div>
@@ -47,76 +51,66 @@
 </template>
 
 <script setup>
-  import { ref, onMounted } from 'vue';
-
-  import axios from 'axios';
-  import { base_url } from '../../../util';
-  import {useToast} from 'vue-toast-notification';
+  import { ref, onMounted, computed, reactive } from 'vue';
+  
+  import 'md-editor-v3/lib/style.css';
   import 'vue-toast-notification/dist/theme-sugar.css';
+
+  import {useToast} from 'vue-toast-notification';
   import { useRouter } from 'vue-router';
   import { MdEditor } from 'md-editor-v3';
-  import 'md-editor-v3/lib/style.css';
-
+  import { useCategoryStore } from '../../../store/category';
+  import { useArticleStore } from '../../../store/article';
+  import Input from '../../../components/Input.vue';
+  import { defaulButtonStyle } from '../../../util';
 
   const config ={
     position: 'top-right',
     dismissible: true,
     duration: 2000,
   }
-  const toast = useToast(config);
-  const router = useRouter()
 
-  const categories = ref([])
+  const toast   = useToast(config);
+  const router  = useRouter()
 
-  const categoryId = ref('')
-  const title = ref('')
-  const image = ref('')
-  const content = ref('')
+  const categoryStore = useCategoryStore();
+  const articleStore  = useArticleStore();
 
-  onMounted(() => {
-    getCategories()
-  })
+  const categories = computed(() => categoryStore.categories);
+  const errors     = computed(() => articleStore.errors);
 
-  const getCategories = async () => {
-    const response = await axios.get(`${base_url}/categories`,{
-      headers: {
-        'Authorization': `bearer ${localStorage.getItem('token')}`
-      }
-    })
-
-    categories.value = response.data.data
+  const initState = {
+    "category_id": '',
+    "title": '',
+    "content": '',
   }
 
+  const data  = reactive({...initState}) 
+  const image = ref('')
+  
   const handleImage = (event) => {
     image.value = event.target.files[0]
   }
 
+  onMounted(() => {
+    categoryStore.getCategories();
+  })
 
   const handleSubmit = async () => {
-    console.log(content.value);
     let formData = new FormData()
 
-    formData.append('category_id', categoryId.value)
-    formData.append('title', title.value)
+    formData.append('category_id', data.category_id)
+    formData.append('title', data.title)
     formData.append('image_cover', image.value)
-    formData.append('content', content.value)
+    formData.append('content', data.content)
 
     try {
-      let response = await axios.post(`${base_url}/articles`, formData, {
-        headers: {
-          'Authorization': `bearer ${localStorage.getItem('token')}`
-        }
-      });
-
-      if (response.status == 201) {
-        toast.success(response.data.message);
-        router.push('/admin/article')
-      }
-
+      const response = await articleStore.storeArticle(formData)
+      toast.success(response.message)
+      router.push('/admin/article')
     } catch (error) {
-      config.type = 'error'
-      console.log(error.response.data);
-      // toast.error(error.response.data.message);
+      typeof(error.message) !== 'object' ?
+      toast.error(error.message) : toast.error(JSON.stringify(error.message));
     }
-  }
+  };
 </script>

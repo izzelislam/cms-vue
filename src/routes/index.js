@@ -59,6 +59,11 @@ const routes = [
         name: 'dashboard',
         component: DashboardPage
       },
+      {
+        path: 'setting',
+        name: 'setting',
+        component: () => import('../pages/admin-page/setting-page/index.vue')
+      },
       userRoute,
       categoryRoute,
       articleRoute,

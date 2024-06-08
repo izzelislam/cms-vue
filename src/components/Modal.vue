@@ -20,6 +20,10 @@
     description: {
       type: String,
       default: '',
+    },
+    isFull: {
+      type: Boolean,
+      default: false,
     }
   });
 
@@ -55,29 +59,30 @@
             leave-to="opacity-0 scale-95"
           >
             <DialogPanel
-              class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all"
+              :class="[isFull ? 'w-full' : 'max-w-lg']"
+              class="w-full  transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all"
             >
               <DialogTitle
                 as="h3"
                 class="text-lg font-medium leading-6 text-gray-900"
               >
-                Payment successful
+                {{ title }}
               </DialogTitle>
-              <div class="mt-2">
+              <div class="mt-2" v-if="description">
                 <p class="text-sm text-gray-500">
-                  Your payment has been successfully submitted. We’ve sent you
-                  an email with all of the details of your order.
+                  {{ description }}
                 </p>
               </div>
 
               <div class="mt-4">
                 <button
                   type="button"
-                  class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                  class="inline-flex justify-center rounded-md border border-transparent bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                   @click="emmit('close')"
                 >
-                  Got it, thanks!
+                  tutup
                 </button>
+                <slot name="footer"></slot>
               </div>
             </DialogPanel>
           </TransitionChild>

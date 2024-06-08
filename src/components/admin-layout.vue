@@ -1,60 +1,62 @@
 <template>
-  <div class="flex">
-    <div class="w-64 h-screen bg-white shadow-lg p-4">
-      <div class="text-center py-12">
-        <h1 class="text-2xl font-bold text-teal-500">NewsQU</h1>
+  <div class="flex relative">
+    <div class="w-64 h-screen bg-white shadow-lg p-4 sticky top-0">
+      <div class="text-center py-12 ">
+        <router-link to="/" class="flex justify-center">
+          <img src="/sinau-dev.png" class="w-[160px]" alt="">
+        </router-link>
       </div>
       <div class="text-gray-500">
         <ul>
           <li class="mb-3">
-            <router-link to="/admin/dashboard" class="flex px-3 py-3 rounded-xl" exact-active-class="bg-teal-400 text-white">
+            <router-link to="/admin/dashboard" class="flex px-3 py-3 rounded-lg text-md" exact-active-class="bg-slate-900 text-slate-50">
               <vue-feather type="home" class="mr-2"></vue-feather> 
               <span>Home</span>
             </router-link>
           </li>
           <li class="mb-3">
-            <router-link to="/admin/category" class="flex px-3 py-3 rounded-xl" exact-active-class="bg-teal-400 text-white">
+            <router-link to="/admin/category" class="flex px-3 py-3 rounded-lg text-md" exact-active-class="bg-slate-900 text-slate-50">
               <vue-feather type="feather" class="mr-2"></vue-feather> 
               <span>Category</span>
             </router-link>
           </li>
           <li class="mb-3">
-            <router-link to="/admin/article" class="flex px-3 py-3 rounded-xl" exact-active-class="bg-teal-400 text-white">
+            <router-link to="/admin/article" class="flex px-3 py-3 rounded-lg text-md" exact-active-class="bg-slate-900 text-slate-50">
               <vue-feather type="file" class="mr-2"></vue-feather> 
               <span>Artikel</span>
             </router-link>
           </li>
 
-          <li class="mb-3">
-            <router-link to="/admin/comment" class="flex px-3 py-3 rounded-xl" exact-active-class="bg-teal-400 text-white">
+          <!-- <li class="mb-3">
+            <router-link to="/admin/comment" class="flex px-3 py-3 rounded-lg text-md" exact-active-class="bg-slate-900 text-slate-50">
               <vue-feather type="message-circle" class="mr-2"></vue-feather> 
               <span>Comment</span>
             </router-link>
-          </li>
+          </li> -->
           <li class="mb-3">
-            <router-link to="/admin/user" class="flex px-3 py-3 rounded-xl" exact-active-class="bg-teal-400 text-white">
+            <router-link to="/admin/user" class="flex px-3 py-3 rounded-lg text-md" exact-active-class="bg-slate-900 text-slate-50">
               <vue-feather type="user" class="mr-2"></vue-feather> 
               <span>User</span>
             </router-link>
           </li>
           <li class="mb-3">
-            <router-link to="/" class="flex px-3 py-3 text-gray-500 rounded-xl">
+            <router-link to="/admin/setting" class="flex px-3 py-3 text-gray-500 rounded-xl" exact-active-class="bg-slate-900 text-slate-50">
               <vue-feather type="settings" class="mr-2"></vue-feather> 
               <span>Pengaturan</span>
             </router-link>
           </li>
         </ul>
       </div>
-      <div class="mt-36">
-        <button @click="handleLogout" class="flex px-3 py-3 text-white rounded-xl bg-red-400 w-full">
+      <div class="mt-36 relative">
+        <button @click="handleLogout" class="flex px-3 py-3 text-white rounded-lg text-md bg-red-500 w-full fixed bottom-0 right-2">
           <vue-feather type="log-out" class="mr-2"></vue-feather> 
           <span>Logout</span>
         </button>
       </div>
     </div>
 
-    <div class="flex-1 bg-gray-100">
-      <div class="w-full h-20 bg-white flex flex-row-reverse items-center px-12">
+    <div class="flex-1 bg-gray-100 relative">
+      <div class="w-full h-20 bg-white flex flex-row-reverse items-center px-12 sticky top-0">
         <div>
           <div class="flex items-center">
             <vue-feather type="user" class="mr-2"></vue-feather> {{ user.email ?? '' }}
@@ -65,80 +67,26 @@
         <router-view></router-view>
       </div>
     </div>
+    <Loading v-if="loading" />
   </div>
 </template>
 
 <script setup>
 
   import { computed, onMounted } from "vue";
-  import { useRouter } from "vue-router";
-  import axios from "axios";
-  import { base_url } from "../util";
-  import { useUserStore } from "../store/user";
+  import { useAuthStore } from "../store/auth";
+import Loading from "./Loading.vue";
 
-  // import {useToast} from 'vue-toast-notification';
-  // import 'vue-toast-notification/dist/theme-sugar.css';
-
-  const userStore = useUserStore()
-  const router = useRouter()
-  const user   = computed(() => userStore.user)
+  const authStore = useAuthStore();
+  const user   = computed(() => authStore.me)
+  const loading = computed(() => authStore.loading);
 
   onMounted(() => {
-    getMeData()
+    authStore.getMe()
   })
 
-  const getMeData = async () => {
-    try {
-      let response = await axios.get(`${base_url}/me`,{
-        headers: {
-          'Authorization': `bearer ${localStorage.getItem('token')}`
-        }
-      });
-
-      if (response.status == 200) {
-        // set data to pinia userstore
-        userStore.setUser( response.data.data )
-        // console.log(userStore.user);
-      }
-
-    } catch (error) {
-      console.log(error);
-      if (error.response.status == 401) {
-        localStorage.removeItem('token')
-        router.push('/login')
-      }
-    } 
-  }
-
-  // const toast = useToast();
-  // let instance = toast.success('You did it!');
-
-  // // Force dismiss specific toast
-  // instance.dismiss();
-
-  // // Dismiss all opened toast immediately
-  // toast.clear();
-
   const handleLogout = async () => {
-    try {
-      let res = await axios.post(`${base_url}/logout`,null,{
-        headers: {
-          'Authorization': `bearer ${localStorage.getItem('token')}`
-        }
-      })
-
-      if (res.status == 200) {
-        localStorage.removeItem('token')
-        router.push('/login')
-      }
-
-    } catch (error) {
-      alert(error.response.data.message)
-      if (error.response.data.message == 'Unauthenticated.'){
-        localStorage.removeItem('token')
-        router.push('/login')
-      }
-    }
-  }
+    authStore.logout()
+  };
 
 </script>

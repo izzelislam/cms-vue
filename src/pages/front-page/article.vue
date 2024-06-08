@@ -13,12 +13,12 @@
   const categories = computed(() => homeStore.categories);
 
   onMounted(() => {
-    homeStore.getArticles(4);
+    homeStore.getArticles(8);
     homeStore.getCategories();
   });
 
   async function handleLoadMore () {
-    await homeStore.loadMoreArticles(4);
+    await homeStore.loadMoreArticles(8);
   };
 
 </script>

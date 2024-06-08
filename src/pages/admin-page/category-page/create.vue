@@ -9,19 +9,19 @@
   <div class="w-full p-5 bg-white rounded-2xl">
     <div class="mb-6 flex justify-between">
       <h1>Daftar Category</h1>
-      <router-link to="/admin/category" class="text-white bg-teal-500 px-8 py-2 rounded-lg flex items-center mr-6"> <vue-feather type="arrow-left"></vue-feather> kembali</router-link>
+      <router-link to="/admin/category" :class="defaulButtonStyle"> <vue-feather type="arrow-left"></vue-feather> kembali</router-link>
     </div>
     <div>
 
       <div class="mb-6">
         <label for="" class="text-gray-500">Name</label>
         <div class="mt-3">
-          <input v-model="formData" type="text" class="w-full border-2 border-gray-300 rounded-lg p-2">
+          <Input v-model="data.name" :error="errors?.name" />
         </div>
       </div>
 
       <div>
-        <button @click="handleSubmit" class="text-white bg-teal-500 px-8 py-2 rounded-lg">Simpan</button>
+        <button @click="handleSubmit" :class="defaulButtonStyle">Simpan</button>
       </div>
 
     </div>
@@ -29,23 +29,34 @@
 </template>
 
 <script setup>
-  import axios from "axios";
-  import {ref} from "vue"
-  import { base_url } from "../../../util";
+  import {computed, reactive, ref, watch} from "vue"
+  import { defaulButtonStyle } from "../../../util";
   import { useRouter } from "vue-router";
   import {useToast} from 'vue-toast-notification';
   import 'vue-toast-notification/dist/theme-sugar.css';
+  import { useCategoryStore } from "../../../store/category";
+  import Input from "../../../components/Input.vue";
+
 
   const config ={
     position: 'top-right',
     dismissible: true,
     duration: 2000,
   }
+
+  const categoryStore = useCategoryStore();
+  const errors = computed(() => categoryStore.errors);
+  const success = computed(() => categoryStore.success);
+
   const toast = useToast(config);
   const router = useRouter()
 
+  const initState = {
+    name: ''
+  }
+
   const alert = ref(false)
-  const formData = ref('')
+  const data = reactive({...initState})
 
   const  toogleAlert = () => {
     alert.value = !alert.value
@@ -53,24 +64,17 @@
 
   const handleSubmit = async () => {
     try {
-      let response = await axios.post(`${base_url}/categories`, {
-        name: formData.value
-      }, {
-        headers: {
-          'Authorization': `bearer ${localStorage.getItem('token')}`
-        }
-      })
-
-      if (response.status == 201){
-        toast.success(response.data.message);
-        router.push('/admin/category')
-      }
-      
+      await categoryStore.storeCategory(data)
+      toast.success(success.value);
+      categoryStore.errors  = {}
+      categoryStore.error   = ''
+      categoryStore.success =''
+      router.push('/admin/category')
     } catch (error) {
-      config.type = 'error'
-      toast.success(error.response.data.message);
+      typeof(error.data.message) !== 'object' ??
+      toast.error(error.data.message );
     }
-  }
+  };
 
 
 

@@ -4,10 +4,10 @@
       <h1>{{ title }}</h1>
       <slot name="header"></slot>
       <div v-if="url">
-        <router-link :to="url" class="text-white bg-teal-500 px-8 py-2 rounded-lg flex items-center mr-6"> <vue-feather type="plus"></vue-feather> Tambah data</router-link>
+        <router-link :to="url" class="btn-primary"> <vue-feather type="plus"></vue-feather> Tambah data</router-link>
       </div>
       <div v-if="back">
-        <router-link :to="back" class="text-white bg-teal-500 px-8 py-2 rounded-lg flex items-center mr-6"> <vue-feather type="arrow-left"></vue-feather> Kembali</router-link>
+        <router-link :to="back" class="btn-primary"> <vue-feather type="arrow-left"></vue-feather> Kembali</router-link>
       </div>
     </div>
     <div>

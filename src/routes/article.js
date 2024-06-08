@@ -1,6 +1,6 @@
 import ListArticle from '../pages/admin-page/article-page/list.vue'
 import CreateArticle from '../pages/admin-page/article-page/create.vue'
-import DetailArticle from '../pages/admin-page/article-page/detail.vue'
+import EditArticle from '../pages/admin-page/article-page/edit.vue'
 
 const articleRoute = {
   path: 'article',
@@ -17,9 +17,9 @@ const articleRoute = {
       component: CreateArticle
     },
     {
-      path: 'update/:id',
-      name: 'article-update',
-      component: DetailArticle
+      path: 'edit/:id',
+      name: 'article-edit',
+      component: EditArticle
     }
   ]
 }

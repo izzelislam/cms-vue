@@ -1,27 +1,92 @@
 import { defineStore } from "pinia";
-import { useAuthStore } from "./auth";
-import { useFetchApi } from "../composable/usefetchApi";
+import { useFetchApi } from "../composable/usefetchApi"
+import { useAuthStore } from "./auth"
 
-export const useUserStore = defineStore("user", {
+
+export const useArticleStore = defineStore("article", {
   state: () => {
     return {
-      users: [],
-      user: {},
-      errors: {},
-      error: null,
-      loading: false
+      article: {},
+      articles: [],
+      loading: false,
+      errors: ''
     }
   },
   actions: {
-    async getUsers(){
+    async getArticleById(id) {
       try {
         this.loading = true
-        const response = await useFetchApi().get('/users')
-        this.users = response.data
+        const response = await useFetchApi().get(`/articles/${id}`)
+        this.article = response.data
         this.loading = false
       } catch (error) {
-        this.loading = false
+        const err = error.data.message
+        if (typeof(err) == 'object') {
+          this.errors = err
+        }else{
+          this.error = err
+        }
 
+        if (error.status == 401) {
+          const authStore = useAuthStore()
+          await authStore.logout()
+        }
+        throw error
+      }
+    },
+    async getArticles() {
+      try {
+        this.loading = true
+        const response = await useFetchApi().get(`/articles`)
+        this.articles = response.data
+        this.loading = false
+      } catch (error) {
+        const err = error.data.message
+        if (typeof(err) == 'object') {
+          this.errors = err
+        }else{
+          this.error = err
+        }
+
+        if (error.status == 401) {
+          const authStore = useAuthStore()
+          await authStore.logout()
+        }
+        throw error
+      }
+    },
+    async storeArticle(payload) {
+        try {
+          this.loading = true
+          const response = await useFetchApi().post('/articles', payload)
+          this.article = response.data
+          this.loading = false
+
+          return response
+        } catch (error) {
+          const err = error.data.message
+          if (typeof(err) == 'object') {
+            this.errors = err
+          }else{
+            this.error = err
+          }
+
+          if (error.status == 401) {
+            const authStore = useAuthStore()
+            await authStore.logout()
+          }
+          throw error
+        }
+      },
+
+    async deleteArticle(id) {
+      try {
+        this.loading = true
+        const response = await useFetchApi().delete(`/articles/${id}`)
+        this.getArticles()
+        this.loading = false
+        return response
+      } catch (error) {
         const err = error.data.message
         if (typeof(err) == 'object') {
           this.errors = err
@@ -37,15 +102,14 @@ export const useUserStore = defineStore("user", {
       }
     },
 
-    async findUser(id){
+    async updateArticle(id, payload) {
       try {
         this.loading = true
-        const response = await useFetchApi().get(`/users/${id}`)
-        this.user = response.data
+        const response = await useFetchApi().post(`/articles/${id}?_method=PUT`, payload)
+        this.getArticles()
         this.loading = false
+        return response
       } catch (error) {
-        this.loading = false
-
         const err = error.data.message
         if (typeof(err) == 'object') {
           this.errors = err
@@ -59,78 +123,6 @@ export const useUserStore = defineStore("user", {
         }
         throw error
       }
-    },
-
-    async updateUser(id, payload){
-      try {
-        this.loading = true
-        const response = await useFetchApi().post(`/users/${id}?_method=PUT`, payload)
-        this.getUsers()
-        this.loading = false
-        return response
-      } catch (error) {
-        this.loading = false
-        const err = error.data.data
-        if (typeof(err) == 'object') {
-          this.errors = err
-        }else{
-          this.error = err
-        }
-
-        if (error.status == 401) {
-          const authStore = useAuthStore()
-          await authStore.logout()
-        }
-        throw error
-      }
-    },
-
-    async deleteUser(id){
-      try {
-        this.loading = true
-        const response = await useFetchApi().delete(`/users/${id}`)
-        this.getUsers()
-        this.loading = false
-        return response
-      } catch (error) {
-        this.loading = false
-        const err = error.data.message
-        if (typeof(err) == 'object') {
-          this.errors = err
-        }else{
-          this.error = err
-        }
-
-        if (error.status == 401) {
-          const authStore = useAuthStore()
-          await authStore.logout()
-        }
-        throw error
-      }
-    },
-    async storeUser(payload){
-      try {
-        this.loading = true
-        const response = await useFetchApi().post('/users', payload)
-        this.getUsers()
-        this.loading = false
-        return response
-      } catch (error) {
-        this.loading = false
-        const err = error.data.data
-        if (typeof(err) == 'object') {
-          this.errors = err
-        }else{
-          this.error = err
-        }
-
-        if (error.status == 401) {
-          const authStore = useAuthStore()
-          await authStore.logout()
-        }
-        throw error
-      }
-      
     }
   }
 })

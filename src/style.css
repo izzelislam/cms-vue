@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components{
+  .btn-primary{
+    @apply text-white bg-slate-900 px-3 py-2 rounded-lg flex items-center hover:bg-slate-500  mr-6 transition-all duration-200
+  }
+  .btn-success{
+    @apply text-white bg-green-600 px-3 py-2 rounded-lg flex items-center hover:bg-green-500  mr-6 transition-all duration-200
+  }
+  .btn-danger{
+    @apply text-white bg-red-600 px-3 py-2 rounded-lg flex items-center hover:bg-red-500  mr-6 transition-all duration-200
+  }
+}

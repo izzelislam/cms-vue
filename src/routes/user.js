@@ -1,5 +1,5 @@
 import ListUser from '../pages/admin-page/user-page/list.vue'
-import DetailUser from '../pages/admin-page/user-page/detail.vue'
+import Edit from '../pages/admin-page/user-page/edit.vue'
 import CreateUser from '../pages/admin-page/user-page/create.vue'
 
 const userRoute = {
@@ -17,9 +17,9 @@ const userRoute = {
       component: CreateUser
     },
     {
-      path: 'update/:id',
-      name: 'user-update',
-      component: DetailUser
+      path: 'edit/:id',
+      name: 'edit-user',
+      component: Edit
     }
   ]
 }

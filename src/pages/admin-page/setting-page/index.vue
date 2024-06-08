@@ -8,6 +8,8 @@
   import { useRoute, useRouter } from 'vue-router';
   import { useUserStore } from '../../../store/user';
   import Loading from '../../../components/Loading.vue';
+import { useAuthStore } from '../../../store/auth';
+import { useCredentialStore } from '../../../store/credential';
 
   const config ={
     position: 'top-right',
@@ -22,27 +24,28 @@
   };
 
   const userStore = useUserStore();
+  const authStore = useAuthStore();
   const toast     = useToast(config);
   const router    = useRouter();
-  const route     = useRoute();
-
-
+  const credentialStore = useCredentialStore();
+  
   const data   = reactive({...initState});
   const errors = computed(() => userStore.errors);
-  const user   = computed(() => userStore.user);
-  const loading = computed(() => userStore.loading); 
+  const user   = computed(() => authStore.me);
+  const loading = computed(() => authStore.loading); 
 
   onMounted( async () => {
-    await userStore.findUser( route.params.id );
+    await authStore.getMe();
     Object.assign(data, {...user.value})
   })
 
   const handleSubmit = async () => {
     try {
-      const response = await userStore.updateUser( route.params.id, data)
+      const response = await userStore.updateUser( data.id, data)
       toast.success(response.message)
+      credentialStore.user = response.data
+      authStore.me = response.data
       userStore.errors  = {}
-      router.push('/admin/user')
     } catch (error) {
       typeof(error.message) !== 'object' ??
       toast.error(error.data.message)
@@ -52,7 +55,7 @@
 </script>
 
 <template>
-  <card title="Update User" back="/admin/user">
+  <card title="Setting">
     
     <Input title="Name" :error="errors?.name" v-model="data.name" />
     <Input title="Email" :error="errors?.email" v-model="data.email" />
